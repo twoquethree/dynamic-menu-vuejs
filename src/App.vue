@@ -35,28 +35,35 @@
                 </template>
               </v-card-title>
                 <v-divider></v-divider>
-              <v-list>
-                <template>
-                  <div v-for="item in categories" :key="item.id">
-                    <v-list-tile 
-                      class="list-item" 
-                      v-if="item.items.length > 0" 
-                      @click="nextItems(item.id)">
+                 <v-list>
+              <div v-for="(value, key) in levels" :key="key">
+                <div v-for="item in value" :key="item.id">
+                   <template v-if="title.level === item.level && title.parent_id === item.parent_id">
+                      <v-list-tile
+                        class="list-item"
+                        >
                         <v-list-tile-title>
                           {{ item.name }}
                         </v-list-tile-title>
                         <v-list-tile-avatar class="text-lg-right">
-                            <v-icon color="black">chevron_right</v-icon>
+                          <v-icon color="black">
+                            chevron_right
+                            </v-icon>
                         </v-list-tile-avatar>
-                    </v-list-tile>
-                    <v-list-tile class="list-item" v-else>
+                      </v-list-tile>
+                   </template>
+                   <template v-else-if="title.level === item.level && title.parent_id === item.parent_id">
+                     <v-list-tile 
+                      class="list-item"
+                      >
                       <v-list-tile-title>
                         {{ item.name }}
                       </v-list-tile-title>
                     </v-list-tile>
-                  </div>
-                 </template>
-              </v-list>
+                   </template>
+                </div>
+              </div>
+               </v-list>
             </v-card>
           </v-layout>
       </v-container>
@@ -65,15 +72,17 @@
 </template>
 
 <script>
-import { find, head, filter } from "lodash";
+import { find, head, filter, isEmpty } from "lodash";
 
 export default {
   data() {
     return {
       title: {
         name: "Categories",
-        current_level: 0
+        level: 1,
+        parent_id: null
       },
+      levels: {},
       items: [
         {
           id: "1",
@@ -88,46 +97,46 @@ export default {
                   name: "Javascript",
                   items: [],
                   parent_id: "1.1",
-                  level: 2
+                  level: 3
                 },
                 {
                   id: "1.1.2",
                   name: "Vue",
                   items: [],
                   parent_id: "1.1",
-                  level: 2
+                  level: 3
                 },
                 {
                   id: "1.1.3",
                   name: "Angular",
                   items: [],
                   parent_id: "1.1",
-                  level: 2
+                  level: 3
                 },
                 {
                   id: "1.1.4",
                   name: "NodeJS",
                   items: [],
                   parent_id: "1.1",
-                  level: 2
+                  level: 3
                 },
                 {
                   id: "1.1.5",
                   name: "React",
                   items: [],
                   parent_id: "1.1",
-                  level: 2
+                  level: 3
                 }
               ],
               parent_id: "1",
-              level: 1
+              level: 2
             },
             {
               id: "1.2",
               name: "Mobile development",
               items: [],
               parent_id: "1",
-              level: 1
+              level: 2
             },
             {
               id: "1.3",
@@ -138,29 +147,29 @@ export default {
                   name: "Python",
                   items: [],
                   parent_id: "1.3",
-                  level: 2
+                  level: 3
                 },
                 {
                   id: "1.3.2",
                   name: "Java",
                   items: [],
                   parent_id: "1.3",
-                  level: 2
+                  level: 3
                 },
                 {
                   id: "1.3.3",
                   name: "C#",
                   items: [],
                   parent_id: "1.3",
-                  level: 2
+                  level: 3
                 }
               ],
               parent_id: "1",
-              level: 1
+              level: 2
             }
           ],
           parent_id: null,
-          level: 0
+          level: 1
         },
         {
           id: "2",
@@ -174,42 +183,44 @@ export default {
                   id: "2.1.1",
                   name: "Financial Analysis",
                   items: [],
-                  parent_id: "2.1"
+                  parent_id: "2.1",
+                  level: 3
                 },
                 {
                   id: "2.2.1",
                   name: "Sales Skills",
                   items: [],
-                  level: 2,
-                  parent_id: "2.2"
+                  parent_id: "2.2",
+                  level: 3
                 },
                 {
                   id: "2.2.2",
                   name: "Lead Generation",
                   items: [],
-                  level: 2,
-                  parent_id: "2.2"
+                  parent_id: "2.2",
+                  level: 3
                 },
                 {
                   id: "2.2.3",
                   name: "Sales Funnel",
                   items: [],
-                  level: 2,
-                  parent_id: "2.2"
+                  parent_id: "2.2",
+                  level: 3
                 },
                 {
                   id: "2.2.4",
                   name: "CRM",
                   items: [],
-                  level: 2,
-                  parent_id: "2.2"
+                  parent_id: "2.2",
+                  level: 3
                 }
               ],
-              parent_id: "2"
+              parent_id: "2",
+              level: 2
             }
           ],
           parent_id: null,
-          level: 0
+          level: 1
         }
       ],
       displayItems: []
@@ -258,15 +269,48 @@ export default {
       });
 
       return item;
+    },
+    buildLevels(items) {
+      for (const i in items) {
+        const item = items[i];
+        this.fillLevels(item, item.items.length > 0);
+        if (item.items) {
+          this.buildLevels(item.items);
+        }
+      }
+    },
+    fillLevels(item, hasSubitems) {
+      const key = item.level;
+      const { id, name, level, parent_id } = item;
+      if (!(key in this.levels)) {
+        this.levels[key] = [
+          {
+            id,
+            name,
+            level,
+            parent_id,
+            hasSubitems
+          }
+        ];
+      } else {
+        this.levels[key].push({
+          id,
+          name,
+          level,
+          parent_id,
+          hasSubitems
+        });
+      }
     }
   },
   computed: {
     categories() {
-      return this.displayItems;
+      return this.levels;
     }
   },
   mounted() {
     this.displayItems = this.items;
+    this.buildLevels(this.items);
   }
 };
 </script>
