@@ -8,9 +8,12 @@
           justify-center
           align-center
           hidden-xs-only>
-          <v-dialog v-model="dialog" scrollable max-width="300px">
+          <v-dialog 
+            v-model="dialog" 
+            scrollable 
+            max-width="300px">
             <v-btn slot="activator" color="primary" dark>Open Menu</v-btn>
-             <v-card color="darken-2" class="elevation-3"> 
+             <v-card> 
               <template v-if="title.parent_id" >
                 <v-layout>
                   <v-flex items-center>
@@ -274,11 +277,15 @@ export default {
       return name;
     },
     rebuildMenu() {
+      this.dialog = false;
       this.menu = [];
+      this.title = {
+        name: "Categories",
+        parent_id: null
+      };
       this.buildMenu(this.items);
     },
     buildMenu(items) {
-      this.dialog = false;
       forEach(items, item => {
         this.populateMenu(item, item.items.length > 0);
         if (item.items) {
