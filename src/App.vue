@@ -1,79 +1,89 @@
 <template>
   <v-app>
     <v-content>
-      <v-container fill-height fluid>
-          <v-layout 
-            justify-center
-            align-center
-            hidden-xs-only
-            column>
-            <v-card color="darken-2" class="elevation-3">
-              <v-card-title>
-                <template v-if="title.parent_id" >
-                  <v-layout>
-                    <v-flex d-inline>
-                      <v-btn 
-                        tag="a"
-                        flat 
-                        @click="previousItems(title.parent_id)">
-                          <v-icon>
-                            chevron_left
-                          </v-icon>
-                      </v-btn>
-                      <span class="text-lg-right">
-                        {{ title.name }}
-                      </span>
-                    </v-flex>
-                  </v-layout>
-                </template>
-                <template v-else>
-                  <v-card-text>
-                    <p class="text-lg-center">
-                      Categories
-                    </p> 
-                  </v-card-text>
-                </template>
+      <v-container 
+        fill-height 
+        fluid>
+        <v-layout
+          justify-center
+          align-center
+          hidden-xs-only>
+          <v-card color="darken-2" class="elevation-3"> 
+            <template v-if="title.parent_id" >
+              <v-layout>
+                <v-flex items-center>
+                  <v-card-title class="subheading">
+                    <v-btn 
+                      icon
+                      flat 
+                      @click="returnToParentItem(title.parent_id)">
+                        <v-icon>
+                          chevron_left
+                        </v-icon>
+                    </v-btn>
+                    {{ title.name }}
+                    </v-card-title>
+                </v-flex>
+              </v-layout>
+            </template>
+            <template v-else>
+              <v-card-title class="subheading">
+                Categories
               </v-card-title>
-                <v-divider></v-divider>
+            </template>
+            <v-divider></v-divider>
+            <v-card-text>
               <v-list>
-                <template>
-                  <div v-for="item in categories" :key="item.id">
-                    <v-list-tile 
-                      class="list-item" 
-                      v-if="item.items.length > 0" 
-                      @click="nextItems(item.id)">
+                <div 
+                  v-for="item in menu" 
+                  :key="item.id">
+                  <template v-if="title.parent_id === item.parent_id && item.hasSubitems">
+                    <v-list-tile
+                      class="list-item"
+                      @click="showItemChilds(item.id)">
+                      <v-list-tile-content>
                         <v-list-tile-title>
                           {{ item.name }}
                         </v-list-tile-title>
-                        <v-list-tile-avatar class="text-lg-right">
-                            <v-icon color="black">chevron_right</v-icon>
+                      </v-list-tile-content>
+                      <v-list-tile-avatar class="text-lg-right">
+                          <v-icon color="black">
+                            chevron_right
+                          </v-icon>
                         </v-list-tile-avatar>
                     </v-list-tile>
-                    <v-list-tile class="list-item" v-else>
-                      <v-list-tile-title>
-                        {{ item.name }}
-                      </v-list-tile-title>
+                  </template>
+                  <template v-else-if="title.parent_id === item.parent_id">
+                    <v-list-tile 
+                      class="list-item">
+                      <v-list-tile-content>
+                        <v-list-tile-title>
+                          {{ item.name }}
+                        </v-list-tile-title>
+                      </v-list-tile-content>
                     </v-list-tile>
-                  </div>
-                 </template>
+                  </template>
+                </div>
               </v-list>
-            </v-card>
-          </v-layout>
+            </v-card-text>
+          </v-card>
+        </v-layout>
       </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import { find, head, filter } from "lodash";
+import { forEach } from "lodash";
 
 export default {
   data() {
     return {
       title: {
         name: "Categories",
-        current_level: 0
+        parent_id: null
       },
+      menu: [],
       items: [
         {
           id: "1",
@@ -87,47 +97,59 @@ export default {
                   id: "1.1.1",
                   name: "Javascript",
                   items: [],
-                  parent_id: "1.1",
-                  level: 2
+                  parent_id: "1.1"
                 },
                 {
                   id: "1.1.2",
                   name: "Vue",
-                  items: [],
-                  parent_id: "1.1",
-                  level: 2
+                  items: [
+                    {
+                      id: "1.1.2.1",
+                      name: "Vuex",
+                      items: [],
+                      parent_id: "1.1.2"
+                    },
+                    {
+                      id: "1.1.2.2",
+                      name: "VueRouter",
+                      items: [],
+                      parent_id: "1.1.2"
+                    },
+                    {
+                      id: "1.1.2.3",
+                      name: "Vue NativeScript",
+                      items: [],
+                      parent_id: "1.1.2"
+                    }
+                  ],
+                  parent_id: "1.1"
                 },
                 {
                   id: "1.1.3",
                   name: "Angular",
                   items: [],
-                  parent_id: "1.1",
-                  level: 2
+                  parent_id: "1.1"
                 },
                 {
                   id: "1.1.4",
                   name: "NodeJS",
                   items: [],
-                  parent_id: "1.1",
-                  level: 2
+                  parent_id: "1.1"
                 },
                 {
                   id: "1.1.5",
                   name: "React",
                   items: [],
-                  parent_id: "1.1",
-                  level: 2
+                  parent_id: "1.1"
                 }
               ],
-              parent_id: "1",
-              level: 1
+              parent_id: "1"
             },
             {
               id: "1.2",
               name: "Mobile development",
               items: [],
-              parent_id: "1",
-              level: 1
+              parent_id: "1"
             },
             {
               id: "1.3",
@@ -137,30 +159,25 @@ export default {
                   id: "1.3.1",
                   name: "Python",
                   items: [],
-                  parent_id: "1.3",
-                  level: 2
+                  parent_id: "1.3"
                 },
                 {
                   id: "1.3.2",
                   name: "Java",
                   items: [],
-                  parent_id: "1.3",
-                  level: 2
+                  parent_id: "1.3"
                 },
                 {
                   id: "1.3.3",
                   name: "C#",
                   items: [],
-                  parent_id: "1.3",
-                  level: 2
+                  parent_id: "1.3"
                 }
               ],
-              parent_id: "1",
-              level: 1
+              parent_id: "1"
             }
           ],
-          parent_id: null,
-          level: 0
+          parent_id: null
         },
         {
           id: "2",
@@ -180,93 +197,94 @@ export default {
                   id: "2.2.1",
                   name: "Sales Skills",
                   items: [],
-                  level: 2,
                   parent_id: "2.2"
                 },
                 {
                   id: "2.2.2",
                   name: "Lead Generation",
                   items: [],
-                  level: 2,
                   parent_id: "2.2"
                 },
                 {
                   id: "2.2.3",
                   name: "Sales Funnel",
                   items: [],
-                  level: 2,
                   parent_id: "2.2"
                 },
                 {
                   id: "2.2.4",
                   name: "CRM",
                   items: [],
-                  level: 2,
                   parent_id: "2.2"
                 }
               ],
               parent_id: "2"
             }
           ],
-          parent_id: null,
-          level: 0
+          parent_id: null
         }
-      ],
-      displayItems: []
+      ]
     };
   },
   methods: {
-    nextItems(id) {
-      const result = find(this.displayItems, i => i.id == id);
-      if (result) {
-        this.title.name = result.name;
-        this.title.parent_id = head(result.items).parent_id;
-        this.displayItems = result.items;
+    isItemFound(itemId, targetId, item) {
+      if (itemId === targetId) {
+        this.title.name = this.getTitle(item.parent_id);
+        this.title.parent_id = item.parent_id;
+
+        return true;
       }
+
+      return false;
     },
-    previousItems(id) {
-      this.displayItems = this.getItems(id, this.items);
-    },
-    getItems(id, items) {
-      let result = [];
-      for (const i in items) {
-        const item = items[i];
-        if (id === item.id) {
-          if (item.parent_id === null) {
-            result = items;
-            break;
-          } else {
-            result = item.items;
-            break;
-          }
-        } else if (item.items.length > 0) {
-          result = this.getItems(id, item.items);
+    showItemChilds(parentId) {
+      forEach(this.menu, item => {
+        if (this.isItemFound(parentId, item.parent_id, item)) {
+          return false;
         }
-      }
-      return result;
+      });
     },
-    getTitle(id, items) {
-      const item = find(items, i => {
-        if (i.id === id) {
-          return {
-            name: i.name,
-            parent_id: i.parent_id
-          };
-        } else if (i.items) {
-          this.getTitle(id, i.items);
+    returnToParentItem(parentId) {
+      forEach(this.menu, item => {
+        if (this.isItemFound(parentId, item.id, item)) {
+          return false;
+        }
+      });
+    },
+    getTitle(id) {
+      let name = null;
+      forEach(this.menu, item => {
+        if (id == item.id) {
+          name = item.name;
+          return false;
         }
       });
 
-      return item;
-    }
-  },
-  computed: {
-    categories() {
-      return this.displayItems;
+      if (name === null) {
+        return "Categories";
+      }
+      return name;
+    },
+    buildMenu(items) {
+      forEach(items, item => {
+        this.populateMenu(item, item.items.length > 0);
+        if (item.items) {
+          this.buildMenu(item.items);
+        }
+      });
+    },
+    populateMenu(item, hasSubitems) {
+      const { id, name, parent_id } = item;
+      this.menu.push({
+        id,
+        name,
+        parent_id,
+        hasSubitems
+      });
     }
   },
   mounted() {
-    this.displayItems = this.items;
+    this.buildMenu(this.items);
   }
 };
 </script>
