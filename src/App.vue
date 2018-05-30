@@ -8,65 +8,72 @@
           justify-center
           align-center
           hidden-xs-only>
-          <v-card color="darken-2" class="elevation-3"> 
-            <template v-if="title.parent_id" >
-              <v-layout>
-                <v-flex items-center>
-                  <v-card-title class="subheading">
-                    <v-btn 
-                      icon
-                      flat 
-                      @click="returnToParentItem(title.parent_id)">
-                        <v-icon>
-                          chevron_left
-                        </v-icon>
-                    </v-btn>
-                    {{ title.name }}
-                    </v-card-title>
-                </v-flex>
-              </v-layout>
-            </template>
-            <template v-else>
-              <v-card-title class="subheading">
-                Categories
-              </v-card-title>
-            </template>
-            <v-divider></v-divider>
-            <v-card-text>
-              <v-list>
-                <div 
-                  v-for="item in menu" 
-                  :key="item.id">
-                  <template v-if="title.parent_id === item.parent_id && item.hasSubitems">
-                    <v-list-tile
-                      class="list-item"
-                      @click="showItemChilds(item.id)">
-                      <v-list-tile-content>
-                        <v-list-tile-title>
-                          {{ item.name }}
-                        </v-list-tile-title>
-                      </v-list-tile-content>
-                      <v-list-tile-avatar class="text-lg-right">
-                          <v-icon color="black">
-                            chevron_right
+          <v-dialog v-model="dialog" scrollable max-width="300px">
+            <v-btn slot="activator" color="primary" dark>Open Menu</v-btn>
+             <v-card color="darken-2" class="elevation-3"> 
+              <template v-if="title.parent_id" >
+                <v-layout>
+                  <v-flex items-center>
+                    <v-card-title class="subheading">
+                      <v-btn 
+                        icon
+                        flat 
+                        @click="returnToParentItem(title.parent_id)">
+                          <v-icon>
+                            chevron_left
                           </v-icon>
-                        </v-list-tile-avatar>
-                    </v-list-tile>
-                  </template>
-                  <template v-else-if="title.parent_id === item.parent_id">
-                    <v-list-tile 
-                      class="list-item">
-                      <v-list-tile-content>
-                        <v-list-tile-title>
-                          {{ item.name }}
-                        </v-list-tile-title>
-                      </v-list-tile-content>
-                    </v-list-tile>
-                  </template>
-                </div>
-              </v-list>
-            </v-card-text>
-          </v-card>
+                      </v-btn>
+                      {{ title.name }}
+                      </v-card-title>
+                  </v-flex>
+                </v-layout>
+              </template>
+              <template v-else>
+                <v-card-title class="ma-2 subheading">
+                  {{ title.name }}
+                </v-card-title>
+              </template>
+              <v-divider></v-divider>
+              <v-card-text style="height: 300px;">
+                <v-list transition="fade-transition" >
+                  <div 
+                    v-for="item in menu" 
+                    :key="item.id">
+                    <template v-if="title.parent_id === item.parent_id && item.hasSubitems">
+                      <v-list-tile
+                        class="list-item"
+                        @click="showItemChilds(item.id)">
+                        <v-list-tile-content>
+                          <v-list-tile-title>
+                            {{ item.name }}
+                          </v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-avatar class="text-lg-right">
+                            <v-icon color="black">
+                              chevron_right
+                            </v-icon>
+                          </v-list-tile-avatar>
+                      </v-list-tile>
+                    </template>
+                    <template v-else-if="title.parent_id === item.parent_id">
+                      <v-list-tile 
+                        class="list-item">
+                        <v-list-tile-content>
+                          <v-list-tile-title>
+                            {{ item.name }}
+                          </v-list-tile-title>
+                        </v-list-tile-content>
+                      </v-list-tile>
+                    </template>
+                  </div>
+                </v-list>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-btn color="blue darken-1" flat @click.native="rebuildMenu()">Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-layout>
       </v-container>
     </v-content>
@@ -79,6 +86,7 @@ import { forEach } from "lodash";
 export default {
   data() {
     return {
+      dialog: false,
       title: {
         name: "Categories",
         parent_id: null
@@ -265,7 +273,12 @@ export default {
       }
       return name;
     },
+    rebuildMenu() {
+      this.menu = [];
+      this.buildMenu(this.items);
+    },
     buildMenu(items) {
+      this.dialog = false;
       forEach(items, item => {
         this.populateMenu(item, item.items.length > 0);
         if (item.items) {
