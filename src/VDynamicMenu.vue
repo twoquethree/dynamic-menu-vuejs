@@ -21,11 +21,7 @@
             <template v-else>
                 <v-card-title class="subheading">
                   <v-icon 
-<<<<<<< HEAD
                     id="ico-header" 
-=======
-                    id="main_header" 
->>>>>>> a8b266426875b72ba628cbde48af5a12c8104417
                     color="black">
                     menu
                   </v-icon>
@@ -230,11 +226,7 @@ export default {
   height: 80px !important;
 }
 
-<<<<<<< HEAD
 #ico-header {
-=======
-#main_header {
->>>>>>> a8b266426875b72ba628cbde48af5a12c8104417
   padding-left: 15px !important;
   padding-right: 15px !important;
 }
