@@ -1,15 +1,15 @@
 <template>
-    <v-dialog 
-        v-model="dialog" 
+    <v-dialog
+        v-model="dialog"
         persistent
-        scrollable 
+        scrollable
         max-width="300px">
-        <v-card> 
+        <v-card>
             <template v-if="title.parent_id" >
                 <v-card-title class="subheading">
                     <v-btn
                     icon
-                    flat 
+                    flat
                     @click="returnToParentItem(title.parent_id)">
                         <v-icon>
                         chevron_left
@@ -25,9 +25,10 @@
             </template>
             <v-divider></v-divider>
             <v-card-text style="height: 300px;">
-                <v-list>
-                    <div 
-                        v-for="item in menu" 
+              <transition name="fade">
+                <v-list v-if="!loading">
+                    <div
+                        v-for="item in menu"
                         :key="item.id">
                         <template v-if="title.parent_id === item.parent_id && item.hasSubitems">
                             <v-list-tile
@@ -46,7 +47,7 @@
                             </v-list-tile>
                         </template>
                         <template v-else-if="title.parent_id === item.parent_id">
-                            <v-list-tile 
+                            <v-list-tile
                             class="list-item">
                             <v-list-tile-content>
                                 <v-list-tile-title>
@@ -57,12 +58,13 @@
                         </template>
                     </div>
                 </v-list>
+              </transition>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
-                <v-btn 
-                    color="blue darken-1" 
-                    flat 
+                <v-btn
+                    color="blue darken-1"
+                    flat
                     @click.native="rebuildMenu()">
                         Close
                 </v-btn>
@@ -118,7 +120,8 @@ export default {
         name: null,
         parent_id: null
       },
-      menu: []
+      menu: [],
+      loading: false
     };
   },
   methods: {
@@ -133,18 +136,26 @@ export default {
       return false;
     },
     showItemChilds(parentId) {
-      forEach(this.menu, item => {
-        if (this.isItemFound(parentId, item.parent_id, item)) {
-          return false;
-        }
-      });
+      this.loading = true;
+      setTimeout(() => {
+        forEach(this.menu, item => {
+          if (this.isItemFound(parentId, item.parent_id, item)) {
+            return false;
+          }
+        });
+        this.loading = false;
+      }, 350);
     },
     returnToParentItem(parentId) {
-      forEach(this.menu, item => {
-        if (this.isItemFound(parentId, item.id, item)) {
-          return false;
-        }
-      });
+      this.loading = true;
+      setTimeout(() => {
+        forEach(this.menu, item => {
+          if (this.isItemFound(parentId, item.id, item)) {
+            return false;
+          }
+        });
+        this.loading = false;
+      }, 350);
     },
     getTitle(id) {
       let name = null;
