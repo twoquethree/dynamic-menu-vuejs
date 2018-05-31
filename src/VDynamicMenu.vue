@@ -20,6 +20,11 @@
             </template>
             <template v-else>
                 <v-card-title class="subheading">
+                  <v-icon 
+                    id="main_header" 
+                    color="black">
+                    menu
+                  </v-icon>
                     {{ title.name }}
                 </v-card-title>
             </template>
@@ -62,6 +67,7 @@
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
+              <v-spacer></v-spacer>
                 <v-btn
                     color="blue darken-1"
                     flat
@@ -204,3 +210,24 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.card__title {
+  height: 80px !important;
+}
+
+#main_header {
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+}
+</style>
