@@ -7,3 +7,7 @@
 .fade-leave-to {
     opacity: 0;
 }
+
+.card__title {
+    height: 80px !important;
+}
