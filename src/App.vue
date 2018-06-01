@@ -1,18 +1,19 @@
 <template>
   <v-app>
     <v-content>
-      <v-container 
-        fill-height 
-        fluid>
-        <v-layout
-          justify-center
+      <v-container
+        grid-list-xl 
+        fill-height>
+        <v-layout 
           align-center
-          hidden-xs-only>
-          <v-dynamic-menu
-            :header="header" 
-            :items="items"
-            :dialog="dialog"
-            @closeMe="close"
+          justify-center>
+          <v-flex xs3>
+            <v-dynamic-menu
+              :header="header" 
+              :items="items"
+              :dialog="dialog"
+              @closeMe="close"
+              @chosenItem="addItem"
             />
             <v-btn 
               dark
@@ -21,6 +22,19 @@
               @click="dialog = !dialog">
               Open Menu
             </v-btn>
+          </v-flex>
+          <v-flex xs3>
+            <v-card>
+              <v-subheader>Selected Items: </v-subheader>
+              <div class="text-xs-left">
+                <v-chip 
+                  v-for="item in selectedItems" 
+                  :key="item.id" >
+                  {{item.id}} - {{item.name}}
+                </v-chip>
+              </div>
+            </v-card>
+          </v-flex>
         </v-layout>
       </v-container>
     </v-content>
@@ -35,6 +49,7 @@ export default {
   },
   data() {
     return {
+      selectedItems: [],
       dialog: false,
       items: [
         {
@@ -146,28 +161,28 @@ export default {
                   parent_id: "2.1"
                 },
                 {
-                  id: "2.2.1",
+                  id: "2.1.2",
                   name: "Sales Skills",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 },
                 {
-                  id: "2.2.2",
+                  id: "2.1.3",
                   name: "Lead Generation",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 },
                 {
-                  id: "2.2.3",
+                  id: "2.1.4",
                   name: "Sales Funnel",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 },
                 {
-                  id: "2.2.4",
+                  id: "2.1.5",
                   name: "CRM",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 }
               ],
               parent_id: "2"
@@ -183,6 +198,11 @@ export default {
     };
   },
   methods: {
+    addItem(value) {
+      const { id, name } = value;
+      const item = { id, name };
+      this.selectedItems.push(item);
+    },
     close() {
       this.dialog = !this.dialog;
     }
