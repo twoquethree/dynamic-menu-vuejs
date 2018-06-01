@@ -139,9 +139,12 @@ export default {
       if (itemId === targetId) {
         this.title.name = this.getTitle(item.parent_id);
         this.title.id = item.parent_id;
-        this.displayItems = filter(this.menu, i => {
-          return this.title.id === i.parent_id;
-        });
+        this.displayItems = [];
+        setTimeout(() => {
+          this.displayItems = filter(this.menu, i => {
+            return this.title.id === i.parent_id;
+          });
+        }, 500);
 
         return true;
       }
@@ -238,14 +241,20 @@ export default {
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s;
+.fade-leave,
+.fade-enter {
+  transform: translateX(10px);
 }
-
-.fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+.fade-enter-to {
+  opacity: 1;
+}
+
+.fade-leave-active,
+.fade-enter-active {
+  transition: all 0.8s ease;
 }
 
 .card__title {
