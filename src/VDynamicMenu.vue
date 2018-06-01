@@ -5,17 +5,17 @@
         scrollable
         max-width="300px">
         <v-card>
-            <template v-if="title.parent_id" >
+            <template v-if="title.id" >
               <v-card-title class="subheading">
                 <v-btn
                   icon
                   flat
-                  @click="returnToParentItem(title.parent_id)">
+                  @click="returnToParentItem(title.id)">
                   <v-icon>
                   chevron_left
                   </v-icon>
                 </v-btn>
-                  {{ title.name }}
+                  {{ title.id }} - {{ title.name }}
               </v-card-title>
             </template>
             <template v-else>
@@ -25,23 +25,23 @@
                   color="black">
                   menu
                 </v-icon>
-                  {{ title.name }}
+                   {{ title.id }} {{ title.name }}
               </v-card-title>
             </template>
             <v-divider></v-divider>
             <v-card-text style="height: 300px;">
-              <transition name="fade">
-                <v-list v-if="!loading">
-                    <template v-for="item in menu">
+                <v-list>
+                  <transition-group name="fade" mode="in-out">
+                    <template v-for="(item, index) in displayItems">
                       <v-list-tile
-                        :key="item.id"
-                        v-if="title.parent_id === item.parent_id && item.hasSubitems"
+                        :key="index"
+                        v-if="item.hasSubitems"
                         class="list-item"
                         @click="showItemChilds(item.id)"
                         :disabled="item.itemsCount <= 0">
                         <v-list-tile-content>
                             <v-list-tile-title>
-                            {{ item.name }}
+                           {{ item.id }} - {{ item.name }}
                             </v-list-tile-title>
                         </v-list-tile-content>
                         <v-list-tile-avatar class="text-lg-right">
@@ -51,19 +51,19 @@
                             </v-list-tile-avatar>
                         </v-list-tile>
                         <v-list-tile
-                          v-else-if="title.parent_id === item.parent_id"
-                          :key="item.id"
+                          v-else-if="title.id === item.parent_id"
+                          :key="index"
                           class="list-item"
                           @click="removeItem(item.id)">
                         <v-list-tile-content>
                             <v-list-tile-title>
-                            {{ item.name }}
+                            {{ item.id }} - {{ item.name }}
                             </v-list-tile-title>
                         </v-list-tile-content>
                       </v-list-tile>
                     </template>
+                    </transition-group>
                 </v-list>
-              </transition>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
@@ -80,7 +80,8 @@
 </template>
 
 <script>
-import { forEach, keysIn, remove, clone, find } from "lodash";
+import { forEach, keysIn, remove, clone, find, filter } from "lodash";
+
 export default {
   name: "VDynamicMenu",
   props: {
@@ -129,15 +130,18 @@ export default {
         name: null,
         parent_id: null
       },
-      menu: [],
-      loading: false
+      displayItems: [],
+      menu: []
     };
   },
   methods: {
     isItemFound(itemId, targetId, item) {
       if (itemId === targetId) {
         this.title.name = this.getTitle(item.parent_id);
-        this.title.parent_id = item.parent_id;
+        this.title.id = item.parent_id;
+        this.displayItems = filter(this.menu, i => {
+          return this.title.id === i.parent_id;
+        });
 
         return true;
       }
@@ -145,26 +149,18 @@ export default {
       return false;
     },
     showItemChilds(parentId) {
-      this.loading = true;
-      setTimeout(() => {
-        forEach(this.menu, item => {
-          if (this.isItemFound(parentId, item.parent_id, item)) {
-            return false;
-          }
-        });
-        this.loading = false;
-      }, 350);
+      forEach(this.menu, item => {
+        if (this.isItemFound(parentId, item.parent_id, item)) {
+          return false;
+        }
+      });
     },
     returnToParentItem(parentId) {
-      this.loading = true;
-      setTimeout(() => {
-        forEach(this.menu, item => {
-          if (this.isItemFound(parentId, item.id, item)) {
-            return false;
-          }
-        });
-        this.loading = false;
-      }, 350);
+      forEach(this.menu, item => {
+        if (this.isItemFound(parentId, item.id, item)) {
+          return false;
+        }
+      });
     },
     getTitle(id) {
       let name = null;
@@ -183,6 +179,7 @@ export default {
     close() {
       this.$emit("closeMe");
       this.title = clone(this.header);
+      this.showItemChilds(null);
     },
     buildMenu(items) {
       forEach(items, item => {
@@ -221,14 +218,21 @@ export default {
   watch: {
     returnedItem: function(val) {
       if (val !== null) {
+        forEach(this.menu, m => {
+          if (m.id === val.parent_id) {
+            m.itemsCount++;
+          }
+        });
+
         this.menu.splice(val.index, 0, val);
-        this.showItemChilds(this.title.parent_id);
+        this.showItemChilds(null);
       }
     }
   },
   mounted() {
     this.buildMenu(this.items);
     this.title = clone(this.header);
+    this.showItemChilds(null);
   }
 };
 </script>
@@ -236,7 +240,7 @@ export default {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s;
+  transition: opacity 1s;
 }
 
 .fade-enter,
