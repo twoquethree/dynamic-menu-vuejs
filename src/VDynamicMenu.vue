@@ -128,7 +128,7 @@ export default {
     return {
       title: {
         name: null,
-        parent_id: null
+        id: null
       },
       displayItems: [],
       menu: []
