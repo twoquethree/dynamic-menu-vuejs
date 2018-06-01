@@ -6,27 +6,27 @@
         max-width="300px">
         <v-card>
             <template v-if="title.parent_id" >
-                <v-card-title class="subheading">
-                    <v-btn
-                    icon
-                    flat
-                    @click="returnToParentItem(title.parent_id)">
-                        <v-icon>
-                        chevron_left
-                        </v-icon>
-                    </v-btn>
-                    {{ title.name }}
-                    </v-card-title>
+              <v-card-title class="subheading">
+                <v-btn
+                  icon
+                  flat
+                  @click="returnToParentItem(title.parent_id)">
+                  <v-icon>
+                  chevron_left
+                  </v-icon>
+                </v-btn>
+                  {{ title.name }}
+              </v-card-title>
             </template>
             <template v-else>
-                <v-card-title class="subheading">
-                  <v-icon 
-                    id="ico-header" 
-                    color="black">
-                    menu
-                  </v-icon>
-                    {{ title.name }}
-                </v-card-title>
+              <v-card-title class="subheading">
+                <v-icon 
+                  id="ico-header" 
+                  color="black">
+                  menu
+                </v-icon>
+                  {{ title.name }}
+              </v-card-title>
             </template>
             <v-divider></v-divider>
             <v-card-text style="height: 300px;">
@@ -53,7 +53,8 @@
                         </template>
                         <template v-else-if="title.parent_id === item.parent_id">
                             <v-list-tile
-                            class="list-item">
+                              class="list-item"
+                              @click="removeItem(item.id)">
                             <v-list-tile-content>
                                 <v-list-tile-title>
                                 {{ item.name }}
@@ -71,7 +72,7 @@
                 <v-btn
                     color="blue darken-1"
                     flat
-                    @click.native="rebuildMenu()">
+                    @click.native="close()">
                         Close
                 </v-btn>
             </v-card-actions>
@@ -80,7 +81,7 @@
 </template>
 
 <script>
-import { forEach, keysIn } from "lodash";
+import { forEach, keysIn, remove, clone } from "lodash";
 export default {
   name: "VDynamicMenu",
   props: {
@@ -177,14 +178,9 @@ export default {
       }
       return name;
     },
-    rebuildMenu() {
+    close() {
       this.$emit("closeMe");
-      this.menu = [];
-      this.title = {
-        name: "Categories",
-        parent_id: null
-      };
-      this.buildMenu(this.items);
+      this.title = clone(this.header);
     },
     buildMenu(items) {
       forEach(items, item => {
@@ -202,11 +198,16 @@ export default {
         parent_id,
         hasSubitems
       });
+    },
+    removeItem(id) {
+      const item = remove(this.menu, m => m.id === id);
+      this.$emit("chosenItem", item[0]);
+      this.close();
     }
   },
   mounted() {
     this.buildMenu(this.items);
-    this.title = this.header;
+    this.title = clone(this.header);
   }
 };
 </script>
@@ -214,7 +215,7 @@ export default {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity 0.2s;
 }
 
 .fade-enter,
