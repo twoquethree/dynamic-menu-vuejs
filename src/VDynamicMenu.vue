@@ -32,37 +32,36 @@
             <v-card-text style="height: 300px;">
               <transition name="fade">
                 <v-list v-if="!loading">
-                    <div
-                        v-for="item in menu"
-                        :key="item.id">
-                        <template v-if="title.parent_id === item.parent_id && item.hasSubitems">
-                            <v-list-tile
-                            class="list-item"
-                            @click="showItemChilds(item.id)">
-                            <v-list-tile-content>
-                                <v-list-tile-title>
-                                {{ item.name }}
-                                </v-list-tile-title>
-                            </v-list-tile-content>
-                            <v-list-tile-avatar class="text-lg-right">
-                                <v-icon color="black">
-                                    chevron_right
-                                </v-icon>
-                                </v-list-tile-avatar>
-                            </v-list-tile>
-                        </template>
-                        <template v-else-if="title.parent_id === item.parent_id">
-                            <v-list-tile
-                              class="list-item"
-                              @click="removeItem(item.id)">
-                            <v-list-tile-content>
-                                <v-list-tile-title>
-                                {{ item.name }}
-                                </v-list-tile-title>
-                            </v-list-tile-content>
-                            </v-list-tile>
-                        </template>
-                    </div>
+                    <template v-for="item in menu">
+                      <v-list-tile
+                        :key="item.id"
+                        v-if="title.parent_id === item.parent_id && item.hasSubitems"
+                        class="list-item"
+                        @click="showItemChilds(item.id)"
+                        :disabled="item.itemsCount <= 0">
+                        <v-list-tile-content>
+                            <v-list-tile-title>
+                            {{ item.name }}
+                            </v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-avatar class="text-lg-right">
+                            <v-icon color="black">
+                                chevron_right
+                            </v-icon>
+                            </v-list-tile-avatar>
+                        </v-list-tile>
+                        <v-list-tile
+                          v-else-if="title.parent_id === item.parent_id"
+                          :key="item.id"
+                          class="list-item"
+                          @click="removeItem(item.id)">
+                        <v-list-tile-content>
+                            <v-list-tile-title>
+                            {{ item.name }}
+                            </v-list-tile-title>
+                        </v-list-tile-content>
+                      </v-list-tile>
+                    </template>
                 </v-list>
               </transition>
             </v-card-text>
@@ -81,7 +80,7 @@
 </template>
 
 <script>
-import { forEach, keysIn, remove, clone } from "lodash";
+import { forEach, keysIn, remove, clone, find } from "lodash";
 export default {
   name: "VDynamicMenu",
   props: {
@@ -191,17 +190,23 @@ export default {
       });
     },
     populateMenu(item, hasSubitems) {
-      const { id, name, parent_id } = item;
       this.menu.push({
-        id,
-        name,
-        parent_id,
+        id: item.id,
+        name: item.name,
+        parent_id: item.parent_id,
+        itemsCount: item.items.length,
         hasSubitems
       });
     },
     removeItem(id) {
-      const item = remove(this.menu, m => m.id === id);
-      this.$emit("chosenItem", item[0]);
+      const result = remove(this.menu, m => m.id === id);
+      const item = result[0];
+      forEach(this.menu, m => {
+        if (m.id === item.parent_id) {
+          m.itemsCount -= 1;
+        }
+      });
+      this.$emit("chosenItem", item);
       this.close();
     }
   },

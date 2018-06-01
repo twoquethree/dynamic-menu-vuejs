@@ -29,8 +29,7 @@
               <div class="text-xs-left">
                 <v-chip 
                   v-for="item in selectedItems" 
-                  :key="item.id" 
-                  close>
+                  :key="item.id" >
                   {{item.id}} - {{item.name}}
                 </v-chip>
               </div>
@@ -162,28 +161,28 @@ export default {
                   parent_id: "2.1"
                 },
                 {
-                  id: "2.2.1",
+                  id: "2.1.2",
                   name: "Sales Skills",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 },
                 {
-                  id: "2.2.2",
+                  id: "2.1.3",
                   name: "Lead Generation",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 },
                 {
-                  id: "2.2.3",
+                  id: "2.1.4",
                   name: "Sales Funnel",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 },
                 {
-                  id: "2.2.4",
+                  id: "2.1.5",
                   name: "CRM",
                   items: [],
-                  parent_id: "2.2"
+                  parent_id: "2.1"
                 }
               ],
               parent_id: "2"
