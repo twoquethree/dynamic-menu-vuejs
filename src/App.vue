@@ -1,45 +1,58 @@
 <template>
   <v-app>
-    <v-content>
+    <v-content >
       <v-container
         grid-list-xl 
+        text-xs-center 
         fill-height>
-        <v-layout 
-          align-center
-          justify-center>
-          <v-flex xs3>
-            <v-dynamic-menu
-              :header="header" 
-              :items="items"
-              :dialog="dialog"
-              :returnedItem="item"
-              @closeMe="close"
-              @chosenItem="addItem"
-            />
-            <v-btn 
-              dark
-              slot="activator" 
-              color="primary"
-              @click="dialog = !dialog">
-              Open Menu
-            </v-btn>
-          </v-flex>
-          <v-flex xs3>
-            <v-card>
-              <v-subheader>Selected Items: </v-subheader>
-              <div class="text-xs-left">
-                <template v-for="item in selectedItems">
-                  <v-chip 
-                    :key="item.id"
-                    @input="removeItem(item.id)"
-                    close>
-                  {{item.id}} - {{item.name}}
-                </v-chip>
-                </template>
-              </div>
-            </v-card>
-          </v-flex>
-        </v-layout>
+        <v-container>
+          <v-layout 
+              align-center
+              justify-center
+              row
+              wrap>
+              <v-flex 
+                xs12 
+                sm3 
+                md3 
+                lg3>
+                <v-dynamic-menu
+                  :header="header" 
+                  :items="items"
+                  :dialog="dialog"
+                  :returnedItem="item"
+                  @closeMe="close"
+                  @chosenItem="addItem"
+                />
+                <v-btn 
+                  dark
+                  slot="activator" 
+                  color="primary"
+                  @click="dialog = !dialog">
+                  Open Menu
+                </v-btn>
+              </v-flex>
+              <v-flex 
+                xs12 
+                sm3 
+                md3 
+                lg3>
+                <v-card>
+                  <v-subheader>Selected Items: </v-subheader>
+                  <div class="text-xs-left">
+                    <template v-for="item in selectedItems">
+                      <v-chip 
+                        :key="item.id"
+                        @input="removeItem(item.id)"
+                        close>
+                      {{item.id}} - {{item.name}}
+                    </v-chip>
+                    </template>
+                  </div>
+                </v-card>
+              </v-flex>
+          </v-layout>
+        </v-container>
       </v-container>
     </v-content>
   </v-app>
