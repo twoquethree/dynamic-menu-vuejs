@@ -2,9 +2,11 @@
 
 > Dynamic Menu with Vue.js
 
+![Alt Text](https://media.giphy.com/media/fWggBlOTiZ9wRtLmcX/giphy.gif)
+
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
 npm install
 
