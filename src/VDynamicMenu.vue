@@ -84,6 +84,9 @@ import { forEach, keysIn, remove, clone, find } from "lodash";
 export default {
   name: "VDynamicMenu",
   props: {
+    returnedItem: {
+      type: Object
+    },
     dialog: {
       type: Boolean,
       required: true
@@ -199,7 +202,12 @@ export default {
       });
     },
     removeItem(id) {
-      const result = remove(this.menu, m => m.id === id);
+      const result = remove(this.menu, (m, index) => {
+        if (m.id === id) {
+          m["index"] = index;
+          return m;
+        }
+      });
       const item = result[0];
       forEach(this.menu, m => {
         if (m.id === item.parent_id) {
@@ -208,6 +216,14 @@ export default {
       });
       this.$emit("chosenItem", item);
       this.close();
+    }
+  },
+  watch: {
+    returnedItem: function(val) {
+      if (val !== null) {
+        this.menu.splice(val.index, 0, val);
+        this.showItemChilds(this.title.parent_id);
+      }
     }
   },
   mounted() {

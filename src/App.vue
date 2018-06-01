@@ -12,6 +12,7 @@
               :header="header" 
               :items="items"
               :dialog="dialog"
+              :returnedItem="item"
               @closeMe="close"
               @chosenItem="addItem"
             />
@@ -27,11 +28,14 @@
             <v-card>
               <v-subheader>Selected Items: </v-subheader>
               <div class="text-xs-left">
-                <v-chip 
-                  v-for="item in selectedItems" 
-                  :key="item.id" >
+                <template v-for="item in selectedItems">
+                  <v-chip 
+                    :key="item.id"
+                    @input="removeItem(item.id)"
+                    close>
                   {{item.id}} - {{item.name}}
                 </v-chip>
+                </template>
               </div>
             </v-card>
           </v-flex>
@@ -43,6 +47,8 @@
 
 <script>
 import VDynamicMenu from "./VDynamicMenu";
+import { remove } from "lodash";
+
 export default {
   components: {
     VDynamicMenu
@@ -51,6 +57,7 @@ export default {
     return {
       selectedItems: [],
       dialog: false,
+      item: null,
       items: [
         {
           id: "1",
@@ -199,12 +206,17 @@ export default {
   },
   methods: {
     addItem(value) {
-      const { id, name } = value;
-      const item = { id, name };
+      const { id, name, parent_id, hasSubitems, index } = value;
+      const item = { id, name, parent_id, index, hasSubitems };
       this.selectedItems.push(item);
     },
     close() {
       this.dialog = !this.dialog;
+    },
+    removeItem(id) {
+      const result = remove(this.selectedItems, i => i.id === id);
+      const item = result[0];
+      this.item = item;
     }
   }
 };
